@@ -5,56 +5,35 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-Page configuration
+st.set_page_config(page_title="Career Compass AI", page_icon="🎯", layout="wide")
 
-st.set_page_config(
-page_title="Career Compass AI",
-page_icon="🎯",
-layout="wide"
-)
-
-Theme-responsive CSS
+Theme-responsive design
 
 st.markdown("""
 
 <style>
-/* Main application background */
 .stApp {
     background-color: var(--background-color);
     color: var(--text-color);
 }
 
-/* Theme-responsive headings */
 h1, h2, h3, h4, label {
     color: var(--text-color);
 }
 
-/* Blue hero banner */
 .hero {
     background: linear-gradient(120deg, #123B70, #3478D4);
     padding: 25px;
     border-radius: 18px;
-    color: white;
     text-align: center;
     margin-bottom: 20px;
+    color: white;
 }
 
-.hero h1,
-.hero h2,
-.hero h3,
-.hero p {
+.hero h1, .hero p {
     color: white !important;
 }
 
-.hero h1 {
-    font-size: 38px;
-}
-
-.hero p {
-    font-size: 18px;
-}
-
-/* Career information card */
 .card {
     background-color: var(--secondary-background-color);
     color: var(--text-color);
@@ -64,36 +43,26 @@ h1, h2, h3, h4, label {
     margin-bottom: 12px;
 }
 
-.card h3,
-.card p {
+.card h3, .card p {
     color: var(--text-color);
 }
 
-/* Input labels */
-.stSelectbox label,
-.stMultiSelect label {
+.stSelectbox label {
     color: var(--text-color);
 }
 
-/* Career exploration sections */
 [data-testid="stExpander"] {
     border: 1px solid #8AA9D6;
     border-radius: 10px;
 }
 
-/* Buttons */
 .stButton button {
     font-weight: bold;
     border-radius: 8px;
 }
-
-/* Footer */
-footer {
-    visibility: hidden;
-}
 </style>""", unsafe_allow_html=True)
 
-Main banner
+Dashboard banner
 
 st.markdown("""
 
@@ -103,7 +72,7 @@ st.markdown("""
     <p>Your journey towards the right career starts here!</p>
 </div>
 """, unsafe_allow_html=True)st.info(
-"Explore possible career paths based on your school stream, "
+"Discover possible career paths based on your school stream, "
 "interests, and preferred work style."
 )
 
@@ -142,27 +111,17 @@ data = pd.DataFrame({
 ]
 })
 
-Prepare machine-learning model
+Train the machine-learning model
 
 features = ["Subject", "Interest", "Work_Style"]
 
 preprocessor = ColumnTransformer([
-(
-"categories",
-OneHotEncoder(handle_unknown="ignore"),
-features
-)
+("categories", OneHotEncoder(handle_unknown="ignore"), features)
 ])
 
 model = Pipeline([
 ("preprocessor", preprocessor),
-(
-"classifier",
-DecisionTreeClassifier(
-max_depth=5,
-random_state=42
-)
-)
+("classifier", DecisionTreeClassifier(max_depth=5, random_state=42))
 ])
 
 model.fit(data[features], data["Career"])
@@ -170,49 +129,29 @@ model.fit(data[features], data["Career"])
 Career descriptions
 
 descriptions = {
-"AI Engineer":
-"Develops artificial intelligence systems and applications.",
-"Software Developer":
-"Designs, builds, and maintains software applications.",
-"Doctor":
-"Diagnoses illnesses and helps treat patients.",
-"Biomedical Scientist":
-"Studies biology and medical science.",
-"Game Designer":
-"Creates concepts and experiences for video games.",
-"AI Ethics Researcher":
-"Studies the responsible and fair use of AI.",
-"Data Scientist":
-"Uses data and statistics to solve problems.",
-"Nurse":
-"Supports patient care and medical treatment.",
-"Financial Analyst":
-"Studies financial information to support decisions.",
-"Business Analyst":
-"Helps organizations improve business processes.",
-"Data Analyst":
-"Examines data to identify useful patterns.",
-"Financial Advisor":
-"Helps people plan and manage their finances.",
-"Entrepreneur":
-"Creates and manages a business.",
-"Product Designer":
-"Designs useful and user-friendly products.",
-"Journalist":
-"Researches, writes, and reports news and stories.",
-"Teacher":
-"Helps students learn and develop their skills.",
-"Graphic Designer":
-"Creates visual designs and communication materials.",
-"Marketing Specialist":
-"Helps organizations promote products and services.",
-"Counselor":
-"Supports people with educational and personal choices.",
-"UX Researcher":
-"Studies user needs to improve digital experiences."
+"AI Engineer": "Develops artificial intelligence systems.",
+"Software Developer": "Designs and builds software applications.",
+"Doctor": "Diagnoses illnesses and treats patients.",
+"Biomedical Scientist": "Studies biology and medical science.",
+"Game Designer": "Creates concepts for video games.",
+"AI Ethics Researcher": "Studies responsible and fair use of AI.",
+"Data Scientist": "Uses data to solve problems.",
+"Nurse": "Supports patient care and treatment.",
+"Financial Analyst": "Studies financial information.",
+"Business Analyst": "Helps improve business processes.",
+"Data Analyst": "Examines data to find useful patterns.",
+"Financial Advisor": "Helps people plan their finances.",
+"Entrepreneur": "Creates and manages a business.",
+"Product Designer": "Designs useful and user-friendly products.",
+"Journalist": "Researches and reports news and stories.",
+"Teacher": "Helps students learn.",
+"Graphic Designer": "Creates visual designs.",
+"Marketing Specialist": "Promotes products and services.",
+"Counselor": "Supports people with personal and educational choices.",
+"UX Researcher": "Studies user needs to improve digital experiences."
 }
 
-Career recommendation section
+Career finder
 
 st.header("🔎 Find Your Career")
 
@@ -227,35 +166,24 @@ subject = st.selectbox(
 interest = st.selectbox(
     "💡 What interests you most?",
     [
-        "Technology",
-        "Finance",
-        "Healthcare",
-        "Writing",
-        "Business",
-        "Art & Design"
+        "Technology", "Finance", "Healthcare",
+        "Writing", "Business", "Art & Design"
     ]
 )
 
 with col2:
 work_style = st.selectbox(
 "🧠 Which work style suits you?",
-[
-"Analytical",
-"Creative",
-"Helping People"
-]
+["Analytical", "Creative", "Helping People"]
 )
 
 st.write("Choose the options that best describe you.")
 
-Generate career recommendation
-
 if st.button("🚀 Find My Career", use_container_width=True):
-
 inputs = pd.DataFrame([{
-    "Subject": subject,
-    "Interest": interest,
-    "Work_Style": work_style
+"Subject": subject,
+"Interest": interest,
+"Work_Style": work_style
 }])
 
 prediction = model.predict(inputs)[0]
@@ -265,31 +193,21 @@ st.subheader("🎓 Your Suggested Career")
 st.success("Your suggested career is: " + prediction)
 
 st.markdown(
-    '<div class="card">'
-    '<h3>About This Career</h3><p>'
+    '<div class="card"><h3>About This Career</h3><p>'
     + descriptions[prediction]
     + '</p></div>',
     unsafe_allow_html=True
 )
 
 st.subheader("🧭 Suggested Next Steps")
-
-st.write(
-    "1. Research the qualifications required for this career."
-)
-st.write(
-    "2. Explore relevant courses and colleges."
-)
-st.write(
-    "3. Talk to teachers or professionals in this field."
-)
-st.write(
-    "4. Compare this option with other careers that interest you."
-)
+st.write("1. Research the qualifications required.")
+st.write("2. Explore relevant courses and colleges.")
+st.write("3. Talk to teachers or professionals.")
+st.write("4. Compare different career options.")
 
 st.warning(
-    "Educational demonstration: this model uses a small sample "
-    "dataset. Its predictions are not validated career assessments. "
+    "This educational demonstration uses a small sample dataset. "
+    "Its predictions are not validated career assessments. "
     "Explore multiple careers before making a decision."
 )
 
@@ -299,18 +217,12 @@ st.markdown("---")
 st.subheader("🌟 Explore Career Fields")
 
 career_fields = {
-"Technology":
-"AI Engineer, Software Developer, Data Scientist",
-"Healthcare":
-"Doctor, Nurse, Biomedical Scientist",
-"Finance":
-"Financial Analyst, Financial Advisor, Accountant",
-"Business":
-"Entrepreneur, Business Analyst, Marketing Specialist",
-"Writing":
-"Journalist, Author, Content Writer",
-"Art & Design":
-"Graphic Designer, Product Designer, Game Designer"
+"Technology": "AI Engineer, Software Developer, Data Scientist",
+"Healthcare": "Doctor, Nurse, Biomedical Scientist",
+"Finance": "Financial Analyst, Financial Advisor, Accountant",
+"Business": "Entrepreneur, Business Analyst, Marketing Specialist",
+"Writing": "Journalist, Author, Content Writer",
+"Art & Design": "Graphic Designer, Product Designer, Game Designer"
 }
 
 for field, careers in career_fields.items():
@@ -321,6 +233,4 @@ Footer
 
 st.markdown("---")
 st.caption("Career Compass AI | Class 12 AI Project")
-st.caption(
-"Designed to support career exploration and informed decisions."
-)
+st.caption("Designed to support career exploration and informed decisions.")
