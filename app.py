@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 
 st.set_page_config(page_title="Career Compass AI", page_icon="🎯", layout="wide")
 
-Application heading
+# Application heading
 
 st.title("🎯 Career Compass AI")
 st.subheader("Discover Your Interests. Explore Your Future.")
