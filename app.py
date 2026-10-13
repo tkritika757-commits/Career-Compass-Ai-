@@ -1,83 +1,542 @@
 import streamlit as st
 import pandas as pd
+
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.pipeline import Pipeline
 
-# -----------------------------------
+
+# ==========================================
 # PAGE CONFIGURATION
-# -----------------------------------
+# ==========================================
+
 st.set_page_config(
     page_title="Career Compass AI",
     page_icon="🎯",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# -----------------------------------
-# APPLICATION HEADING
-# -----------------------------------
-st.title("🎯 Career Compass AI")
-st.subheader("Discover a Career That Matches Your Interests")
-st.caption("Career Compass AI | Class 12 AI Project")
 
-st.write(
-    "Answer a few questions to discover suitable career options, "
-    "your strengths, required skills, and courses after Class 12."
+# ==========================================
+# LUXURY PREMIUM DESIGN
+# ==========================================
+
+st.markdown(
+    """
+    <style>
+    @import url(
+        'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap'
+    );
+
+    :root {
+        --gold: #D6B46A;
+        --gold-light: #F5DFA5;
+        --background: #0B0B0F;
+        --card: #15151C;
+        --border: #393025;
+        --text: #F5F0E6;
+        --muted: #AAA6A0;
+    }
+
+    .stApp {
+        background:
+            radial-gradient(
+                ellipse at top,
+                #282016 0%,
+                #111015 38%,
+                #0B0B0F 75%
+            );
+        color: var(--text);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .block-container {
+        max-width: 1150px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
+
+    h1, h2, h3 {
+        color: var(--gold-light) !important;
+        font-family: 'Playfair Display', serif !important;
+    }
+
+    p, label, span, li {
+        color: var(--text);
+    }
+
+    .brand {
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+
+    .hero {
+        background: linear-gradient(
+            135deg,
+            #211B15 0%,
+            #15141A 55%,
+            #211B15 100%
+        );
+        border: 1px solid #65502D;
+        border-radius: 24px;
+        padding: 38px 30px;
+        margin: 12px 0 28px 0;
+        text-align: center;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero h1 {
+        font-size: clamp(34px, 5vw, 54px);
+        margin: 8px 0 14px 0;
+    }
+
+    .hero p {
+        color: #D0C8BA;
+        font-size: 16px;
+        line-height: 1.8;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .gold-line {
+        height: 2px;
+        width: 75px;
+        margin: 18px auto;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            var(--gold),
+            transparent
+        );
+    }
+
+    .section-label {
+        color: var(--gold);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .panel {
+        background: rgba(21, 21, 28, 0.95);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 25px;
+        margin: 12px 0 20px 0;
+    }
+
+    .career-card {
+        background: linear-gradient(
+            145deg,
+            #1D1A17,
+            #14141A
+        );
+        border: 1px solid #5A482B;
+        border-radius: 18px;
+        padding: 24px;
+        margin: 12px 0;
+        min-height: 245px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .career-number {
+        color: var(--gold);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .career-title {
+        color: var(--gold-light);
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 12px 0;
+    }
+
+    .career-description {
+        color: #D0C8BA;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .match-label {
+        display: inline-block;
+        border: 1px solid #796235;
+        border-radius: 30px;
+        padding: 6px 12px;
+        margin-top: 14px;
+        color: var(--gold-light);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .info-card {
+        background: #15151C;
+        border: 1px solid #393025;
+        border-radius: 14px;
+        padding: 20px;
+        margin: 10px 0;
+    }
+
+    .info-card h4 {
+        color: var(--gold-light);
+        margin-top: 0;
+    }
+
+    .small-note {
+        color: #AAA6A0;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .stButton > button {
+        width: 100%;
+        min-height: 48px;
+        background: linear-gradient(
+            135deg,
+            #F0D797,
+            #B78D43
+        );
+        color: #17120A !important;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        transition: 0.25s ease;
+    }
+
+    .stButton > button:hover {
+        background: linear-gradient(
+            135deg,
+            #FFE9AD,
+            #D6B46A
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(214, 180, 106, 0.2);
+    }
+
+    div[data-baseweb="select"] > div {
+        background: #1A191D;
+        border-color: #65502D;
+        border-radius: 10px;
+    }
+
+    .stTextInput input {
+        background: #1A191D;
+        color: white;
+        border-color: #65502D;
+        border-radius: 10px;
+    }
+
+    div[data-testid="stMetric"] {
+        background: #17161B;
+        border: 1px solid #393025;
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #C6BCA9;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #E9CC88;
+    }
+
+    hr {
+        border-color: #393025;
+    }
+
+    .footer {
+        text-align: center;
+        color: #8F887D;
+        font-size: 12px;
+        padding: 25px 0 10px 0;
+        border-top: 1px solid #393025;
+        margin-top: 35px;
+    }
+
+    @media (max-width: 600px) {
+        .block-container {
+            padding: 1rem 0.8rem 2rem 0.8rem;
+        }
+
+        .hero {
+            padding: 28px 18px;
+        }
+
+        .panel {
+            padding: 18px;
+        }
+
+        .career-card {
+            padding: 20px;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
-st.divider()
 
-# -----------------------------------
-# SAMPLE TRAINING DATASET
-# -----------------------------------
-data = {
-    "Subject": [
-        "Science", "Science", "Science", "Science",
-        "Commerce", "Commerce", "Commerce", "Commerce",
-        "Arts", "Arts", "Arts", "Arts",
-        "Science", "Commerce", "Arts", "Science",
-        "Commerce", "Arts"
-    ],
-    "Interest": [
-        "Technology", "Healthcare", "Research", "Technology",
-        "Business", "Finance", "Business", "Finance",
-        "Writing", "Design", "Social Work", "Writing",
-        "Research", "Business", "Design", "Healthcare",
-        "Finance", "Social Work"
-    ],
-    "Work_Style": [
-        "Problem Solving", "Helping People", "Independent",
-        "Problem Solving", "Leadership", "Analytical",
-        "Leadership", "Analytical", "Creative", "Creative",
-        "Helping People", "Creative", "Independent",
-        "Leadership", "Creative", "Helping People",
-        "Analytical", "Helping People"
-    ],
-    "Career": [
-        "Software Engineer", "Doctor", "Research Scientist",
-        "AI Engineer", "Business Manager", "Financial Analyst",
-        "Entrepreneur", "Accountant", "Content Writer",
-        "Graphic Designer", "Social Worker", "Journalist",
-        "Research Scientist", "Entrepreneur", "Graphic Designer",
-        "Doctor", "Financial Analyst", "Social Worker"
-    ]
+# ==========================================
+# WEBSITE HEADER
+# ==========================================
+
+st.markdown(
+    """
+    <div class="brand">
+        ✦ Career Compass AI
+    </div>
+
+    <div class="hero">
+        <div class="section-label">
+            YOUR FUTURE, REIMAGINED
+        </div>
+
+        <h1>Discover Your True Potential</h1>
+
+        <div class="gold-line"></div>
+
+        <p>
+            Your interests. Your strengths. Your future.
+            Explore career possibilities with an AI-powered
+            career guidance experience designed around you.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ==========================================
+# CAREER INFORMATION
+# ==========================================
+
+career_info = {
+    "AI Engineer": {
+        "description":
+            "Develop intelligent systems, machine learning "
+            "applications, and AI-powered solutions.",
+
+        "strengths":
+            ["Logical thinking", "Problem-solving", "Curiosity"],
+
+        "skills":
+            ["Python", "Mathematics", "Machine Learning"],
+
+        "courses":
+            ["B.Tech Computer Science", "B.Sc. Computer Science",
+             "AI and Data Science"]
+    },
+
+    "Software Developer": {
+        "description":
+            "Design, build, test, and maintain applications "
+            "and software systems.",
+
+        "strengths":
+            ["Logical reasoning", "Creativity", "Persistence"],
+
+        "skills":
+            ["Python or Java", "Programming", "Debugging"],
+
+        "courses":
+            ["B.Tech Computer Science", "BCA", "B.Sc. IT"]
+    },
+
+    "Data Analyst": {
+        "description":
+            "Turn data into useful insights that help "
+            "organisations make informed decisions.",
+
+        "strengths":
+            ["Attention to detail", "Analytical thinking",
+             "Numerical reasoning"],
+
+        "skills":
+            ["Excel", "SQL", "Data visualisation"],
+
+        "courses":
+            ["B.Sc. Statistics", "BCA", "Data Analytics courses"]
+    },
+
+    "Doctor": {
+        "description":
+            "Diagnose illnesses, support patients, and "
+            "contribute to healthcare and medical science.",
+
+        "strengths":
+            ["Empathy", "Discipline", "Scientific thinking"],
+
+        "skills":
+            ["Biology", "Communication", "Clinical reasoning"],
+
+        "courses":
+            ["MBBS", "Relevant healthcare degrees"]
+    },
+
+    "Biotechnologist": {
+        "description":
+            "Apply biological science and technology to "
+            "research, medicine, agriculture, and industry.",
+
+        "strengths":
+            ["Scientific curiosity", "Patience", "Observation"],
+
+        "skills":
+            ["Biology", "Laboratory methods", "Research"],
+
+        "courses":
+            ["B.Sc. Biotechnology", "B.Tech Biotechnology",
+             "Related life-science degrees"]
+    },
+
+    "Business Manager": {
+        "description":
+            "Coordinate people, projects, and resources "
+            "to help organisations achieve their goals.",
+
+        "strengths":
+            ["Leadership", "Decision-making", "Organisation"],
+
+        "skills":
+            ["Communication", "Planning", "Business analysis"],
+
+        "courses":
+            ["BBA", "B.Com", "Business-related degrees"]
+    },
+
+    "Graphic Designer": {
+        "description":
+            "Create visual concepts for brands, websites, "
+            "advertising, and digital media.",
+
+        "strengths":
+            ["Creativity", "Visual thinking", "Originality"],
+
+        "skills":
+            ["Typography", "Layout", "Design software"],
+
+        "courses":
+            ["B.Des", "Visual Communication",
+             "Graphic Design courses"]
+    },
+
+    "Environmental Scientist": {
+        "description":
+            "Study environmental systems and help address "
+            "pollution, conservation, and sustainability.",
+
+        "strengths":
+            ["Observation", "Research", "Environmental awareness"],
+
+        "skills":
+            ["Biology", "Data analysis", "Field research"],
+
+        "courses":
+            ["B.Sc. Environmental Science",
+             "Related environmental degrees"]
+    }
 }
 
-df = pd.DataFrame(data)
 
-# -----------------------------------
-# TRAIN THE AI MODEL
-# -----------------------------------
-X = df[["Subject", "Interest", "Work_Style"]]
-y = df["Career"]
+# ==========================================
+# TRAINING DATA
+# ==========================================
+
+training_rows = [
+    ("Computer Science", "Technology", "Analytical",
+     "AI Engineer"),
+    ("Mathematics", "Technology", "Analytical",
+     "AI Engineer"),
+    ("Computer Science", "Research", "Independent",
+     "AI Engineer"),
+    ("Computer Science", "Technology", "Practical",
+     "Software Developer"),
+    ("Mathematics", "Technology", "Independent",
+     "Software Developer"),
+    ("Computer Science", "Creative Work", "Analytical",
+     "Software Developer"),
+    ("Mathematics", "Business", "Analytical",
+     "Data Analyst"),
+    ("Commerce", "Research", "Organized",
+     "Data Analyst"),
+    ("Computer Science", "Research", "Analytical",
+     "Data Analyst"),
+    ("Biology", "Helping People", "People-oriented",
+     "Doctor"),
+    ("Biology", "Research", "Organized",
+     "Doctor"),
+    ("Science", "Helping People", "People-oriented",
+     "Doctor"),
+    ("Biology", "Research", "Independent",
+     "Biotechnologist"),
+    ("Science", "Nature", "Analytical",
+     "Biotechnologist"),
+    ("Biology", "Nature", "Practical",
+     "Environmental Scientist"),
+    ("Science", "Nature", "Independent",
+     "Environmental Scientist"),
+    ("Arts & Humanities", "Creative Work", "Creative",
+     "Graphic Designer"),
+    ("Arts & Humanities", "Creative Work", "Independent",
+     "Graphic Designer"),
+    ("Computer Science", "Creative Work", "Creative",
+     "Graphic Designer"),
+    ("Commerce", "Business", "Organized",
+     "Business Manager"),
+    ("Commerce", "Business", "People-oriented",
+     "Business Manager"),
+    ("Mathematics", "Business", "Organized",
+     "Business Manager"),
+    ("Science", "Nature", "Research",
+     "Environmental Scientist"),
+    ("Biology", "Research", "Analytical",
+     "Biotechnologist")
+]
+
+column_names = [
+    "Subject",
+    "Interest",
+    "Work_Style",
+    "Career"
+]
+
+data = pd.DataFrame(
+    training_rows,
+    columns=column_names
+)
+
+
+# ==========================================
+# MACHINE LEARNING MODEL
+# ==========================================
+
+features = [
+    "Subject",
+    "Interest",
+    "Work_Style"
+]
+
+X = data[features]
+y = data["Career"]
 
 preprocessor = ColumnTransformer(
     transformers=[
         (
-            "categorical",
+            "categories",
             OneHotEncoder(handle_unknown="ignore"),
-            ["Subject", "Interest", "Work_Style"]
+            features
         )
     ]
 )
@@ -88,8 +547,9 @@ model = Pipeline(
         (
             "classifier",
             DecisionTreeClassifier(
-                max_depth=5,
-                random_state=42
+                max_depth=8,
+                random_state=42,
+                class_weight="balanced"
             )
         )
     ]
@@ -97,223 +557,96 @@ model = Pipeline(
 
 model.fit(X, y)
 
-# -----------------------------------
-# CAREER INFORMATION
-# -----------------------------------
-career_info = {
-    "Software Engineer": {
-        "strengths": "Logical thinking and problem-solving",
-        "skills": "Python, programming, algorithms, and teamwork",
-        "courses": "B.Tech in Computer Science, BCA, or B.Sc. Computer Science",
-        "explanation": "Your science background, technology interest, "
-                       "and problem-solving preference match this career."
-    },
-    "AI Engineer": {
-        "strengths": "Analytical thinking and logical reasoning",
-        "skills": "Python, mathematics, machine learning, and data analysis",
-        "courses": "B.Tech in AI/Computer Science or B.Sc. Computer Science "
-                   "with relevant AI training",
-        "explanation": "Your interest in technology and problem-solving "
-                       "may suit a career in artificial intelligence."
-    },
-    "Doctor": {
-        "strengths": "Empathy, patience, and scientific thinking",
-        "skills": "Biology, communication, observation, and decision-making",
-        "courses": "MBBS through the applicable NEET-UG admission process",
-        "explanation": "Your interest in healthcare and helping people "
-                       "matches the responsibilities of a medical career."
-    },
-    "Research Scientist": {
-        "strengths": "Curiosity, observation, and critical thinking",
-        "skills": "Research methods, data analysis, and scientific reasoning",
-        "courses": "B.Sc. followed by further study, or an appropriate "
-                   "integrated science degree",
-        "explanation": "Your interest in research and independent work "
-                       "may suit scientific investigation."
-    },
-    "Business Manager": {
-        "strengths": "Leadership, planning, and communication",
-        "skills": "Management, teamwork, decision-making, and organization",
-        "courses": "BBA, B.Com., or another suitable management-related degree",
-        "explanation": "Your business interest and leadership preference "
-                       "may suit management."
-    },
-    "Financial Analyst": {
-        "strengths": "Numerical reasoning and analytical thinking",
-        "skills": "Excel, accounting, financial analysis, and statistics",
-        "courses": "B.Com., BBA in Finance, or another relevant degree",
-        "explanation": "Your interest in finance and analytical work "
-                       "may suit financial analysis."
-    },
-    "Entrepreneur": {
-        "strengths": "Initiative, creativity, and leadership",
-        "skills": "Business planning, communication, budgeting, and marketing",
-        "courses": "BBA, B.Com., or another relevant degree",
-        "explanation": "Your business interest and leadership preference "
-                       "may suit starting or managing a business."
-    },
-    "Accountant": {
-        "strengths": "Accuracy, organization, and numerical reasoning",
-        "skills": "Accounting, Excel, taxation, and financial reporting",
-        "courses": "B.Com. or a suitable accounting-related qualification",
-        "explanation": "Your commerce background and interest in finance "
-                       "may suit accounting."
-    },
-    "Content Writer": {
-        "strengths": "Creativity, language, and communication",
-        "skills": "Writing, research, editing, and grammar",
-        "courses": "BA in English, Journalism, or another relevant degree",
-        "explanation": "Your interest in writing and creative work "
-                       "may suit content creation."
-    },
-    "Graphic Designer": {
-        "strengths": "Visual creativity and imagination",
-        "skills": "Design principles, typography, color theory, and design tools",
-        "courses": "B.Des., a suitable design degree, or a relevant diploma",
-        "explanation": "Your interest in design and creative work "
-                       "may suit graphic design."
-    },
-    "Social Worker": {
-        "strengths": "Empathy, patience, and interpersonal communication",
-        "skills": "Communication, community support, and problem-solving",
-        "courses": "BSW or another suitable social-science degree",
-        "explanation": "Your interest in social work and helping people "
-                       "may suit community-focused work."
-    },
-    "Journalist": {
-        "strengths": "Communication, curiosity, and observation",
-        "skills": "Writing, interviewing, research, and fact-checking",
-        "courses": "BA in Journalism or a relevant mass communication degree",
-        "explanation": "Your interest in writing and communication "
-                       "may suit journalism."
-    }
-}
 
-# -----------------------------------
-# USER INPUT SECTION
-# -----------------------------------
-st.header("📝 Tell Us About Yourself")
+# ==========================================
+# STUDENT INPUT FORM
+# ==========================================
 
-col1, col2, col3 = st.columns(3)
+st.markdown(
+    """
+    <div class="panel">
+        <div class="section-label">01 / YOUR PROFILE</div>
+        <h2>Let's Find Your Direction</h2>
+        <p>
+            Tell us about your academic background,
+            interests, and preferred way of working.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-with col1:
-    subject = st.selectbox(
-        "Choose your stream",
-        ["Science", "Commerce", "Arts"]
+with st.form("career_form"):
+
+    name = st.text_input(
+        "Your name (optional)",
+        placeholder="Enter your name"
     )
 
-with col2:
-    interest = st.selectbox(
-        "What interests you most?",
-        [
-            "Technology",
-            "Healthcare",
-            "Research",
-            "Business",
-            "Finance",
-            "Writing",
-            "Design",
-            "Social Work"
-        ]
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        subject = st.selectbox(
+            "Favourite subject",
+            [
+                "Computer Science",
+                "Mathematics",
+                "Biology",
+                "Science",
+                "Commerce",
+                "Arts & Humanities"
+            ]
+        )
+
+        interest = st.selectbox(
+            "What interests you most?",
+            [
+                "Technology",
+                "Helping People",
+                "Business",
+                "Creative Work",
+                "Research",
+                "Nature"
+            ]
+        )
+
+    with col2:
+
+        work_style = st.selectbox(
+            "Preferred working style",
+            [
+                "Analytical",
+                "People-oriented",
+                "Creative",
+                "Practical",
+                "Organized",
+                "Independent"
+            ]
+        )
+
+        study_level = st.selectbox(
+            "Your current education level",
+            [
+                "Class 11",
+                "Class 12",
+                "Undergraduate",
+                "Graduate",
+                "Other"
+            ]
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    submitted = st.form_submit_button(
+        "✦  DISCOVER MY CAREER"
     )
 
-with col3:
-    work_style = st.selectbox(
-        "Which work style do you prefer?",
-        [
-            "Problem Solving",
-            "Helping People",
-            "Independent",
-            "Leadership",
-            "Analytical",
-            "Creative"
-        ]
-    )
 
-st.write("")
-
-# -----------------------------------
+# ==========================================
 # CAREER PREDICTION
-# -----------------------------------
-if st.button("🔍 Find My Career", type="primary"):
+# ==========================================
 
-    user_data = pd.DataFrame(
-        [{
-            "Subject": subject,
-            "Interest": interest,
-            "Work_Style": work_style
-        }]
-    )
+if submitted:
 
-    probabilities = model.predict_proba(user_data)[0]
-    classes = model.named_steps["classifier"].classes_
-
-    ranked_indices = probabilities.argsort()[::-1]
-
-    recommendations = []
-
-    for index in ranked_indices:
-        career = classes[index]
-
-        if career not in recommendations:
-            recommendations.append(career)
-
-        if len(recommendations) == 3:
-            break
-
-    st.divider()
-    st.header("🌟 Your Career Recommendations")
-
-    st.info(
-        "These are AI-generated suggestions based on your answers. "
-        "Use them as a starting point for career exploration."
-    )
-
-    for rank, career in enumerate(recommendations, start=1):
-
-        details = career_info[career]
-
-        with st.container(border=True):
-
-            st.subheader(f"{rank}. {career}")
-
-            st.write("💪 **Your potential strengths**")
-            st.write(details["strengths"])
-
-            st.write("🛠️ **Skills to develop**")
-            st.write(details["skills"])
-
-            st.write("🎓 **Suitable courses after Class 12**")
-            st.write(details["courses"])
-
-            st.write("🤖 **AI explanation**")
-            st.write(details["explanation"])
-
-            st.write(
-                f"**Model score:** {probabilities[classes.tolist().index(career)] * 100:.1f}%"
-            )
-
-    st.divider()
-
-    st.subheader("💡 A Helpful Career Tip")
-
-    st.write(
-        "Before choosing a career, explore the course syllabus, "
-        "eligibility requirements, fees, and future opportunities. "
-        "Talk to teachers, counsellors, and professionals in the field."
-    )
-
-# -----------------------------------
-# FOOTER
-# -----------------------------------
-st.divider()
-
-st.caption(
-    "Career Compass AI | Educational AI Project | Class 12"
-)
-
-st.caption(
-    "Note: This demonstration uses a small sample dataset. "
-    "Recommendations are educational suggestions, not guaranteed "
-    "predictions of career success."
-)
+   
