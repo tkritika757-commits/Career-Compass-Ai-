@@ -41,13 +41,12 @@ st.markdown(
     }
 
     .stApp {
-        background:
-            radial-gradient(
-                ellipse at top,
-                #282016 0%,
-                #111015 38%,
-                #0B0B0F 75%
-            );
+        background: radial-gradient(
+            ellipse at top,
+            #282016 0%,
+            #111015 38%,
+            #0B0B0F 75%
+        );
         color: var(--text);
         font-family: 'Inter', sans-serif;
     }
@@ -649,4 +648,200 @@ with st.form("career_form"):
 
 if submitted:
 
-   
+    student = pd.DataFrame(
+        [
+            {
+                "Subject": subject,
+                "Interest": interest,
+                "Work_Style": work_style
+            }
+        ]
+    )
+
+    probabilities = model.predict_proba(student)[0]
+
+    classes = model.named_steps["classifier"].classes_
+
+    ranking = sorted(
+        zip(classes, probabilities),
+        key=lambda item: item[1],
+        reverse=True
+    )[:3]
+
+    st.markdown("---")
+
+    greeting = (
+        f"Welcome, {name.strip()}!"
+        if name.strip()
+        else "Your Career Discovery Results"
+    )
+
+    st.markdown(
+        f"""
+        <div class="panel">
+            <div class="section-label">
+                02 / YOUR RESULTS
+            </div>
+
+            <h2>{greeting}</h2>
+
+            <p>
+                Explore these career paths based on your
+                selected interests and preferences.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    metric1, metric2, metric3 = st.columns(3)
+
+    metric1.metric("Education Level", study_level)
+    metric2.metric("Interest", interest)
+    metric3.metric("Work Style", work_style)
+
+    st.markdown("## ✦ Your Top 3 Career Matches")
+
+    st.caption(
+        "These rankings are produced by a demonstration "
+        "machine-learning model trained on a small sample "
+        "dataset. They are exploratory suggestions, not "
+        "validated probabilities of career success."
+    )
+
+    for index, (career, score) in enumerate(ranking):
+
+        info = career_info[career]
+
+        st.markdown(
+            f"""
+            <div class="career-card">
+                <div class="career-number">
+                    CAREER OPTION 0{index + 1}
+                </div>
+
+                <div class="career-title">
+                    {career}
+                </div>
+
+                <div class="career-description">
+                    {info["description"]}
+                </div>
+
+                <div class="match-label">
+                    Model score: {score * 100:.1f}%
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        with st.expander(f"Explore {career}"):
+
+            left, right = st.columns(2)
+
+            with left:
+
+                st.markdown("### ✦ Potential strengths")
+
+                for strength in info["strengths"]:
+                    st.write(f"• {strength}")
+
+                st.markdown("### ✦ Skills to develop")
+
+                for skill in info["skills"]:
+                    st.write(f"• {skill}")
+
+            with right:
+
+                st.markdown("### ✦ Courses to explore")
+
+                for course in info["courses"]:
+                    st.write(f"• {course}")
+
+                st.markdown("### ✦ Suggested next steps")
+
+                st.write(
+                    "Explore the course syllabus, check "
+                    "eligibility requirements, try a beginner "
+                    "project, and speak with a career counsellor."
+                )
+
+    st.success(
+        "Your career exploration report is ready!"
+    )
+
+    st.info(
+        "Remember: Your interests can evolve. Explore "
+        "different fields before making an important "
+        "education or career decision."
+    )
+
+
+# ==========================================
+# CAREER EXPLORATION SECTION
+# ==========================================
+
+st.markdown("---")
+
+st.markdown(
+    """
+    <div class="panel">
+        <div class="section-label">03 / EXPLORE</div>
+        <h2>Explore Your Possibilities</h2>
+        <p>
+            Every career starts with curiosity.
+            Learn about different professional paths
+            and the skills they may require.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+career_columns = st.columns(2)
+
+all_careers = list(career_info.items())
+
+for index, (career, info) in enumerate(all_careers):
+
+    with career_columns[index % 2]:
+
+        st.markdown(
+            f"""
+            <div class="info-card">
+                <h4>✦ {career}</h4>
+                <p>{info["description"]}</p>
+                <p class="small-note">
+                    Key skills: {", ".join(info["skills"])}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+# ==========================================
+# FOOTER
+# ==========================================
+
+st.markdown(
+    """
+    <div class="footer">
+        <p>
+            ✦ CAREER COMPASS AI ✦
+        </p>
+
+        <p>
+            A student career exploration project
+            powered by Python and Machine Learning.
+        </p>
+
+        <p>
+            Educational guidance only • Explore your future
+            with curiosity and confidence.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
