@@ -4,14 +4,12 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-
+st.set_page_config(page_title="Career Compass AI", page_icon="🎯", layout="wide")
 Page configuration
-
 st.set_page_config(
 page_title="Career Compass AI",
 page_icon="🎯",
-layout="wide"
-)
+layout="wide")
 
 Custom CSS
 
