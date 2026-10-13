@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 
 st.set_page_config(page_title="Career Compass AI", page_icon="🎯", layout="wide")
 
-Theme-responsive design
+# Theme-responsive design
 
 st.markdown("""
 
