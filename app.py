@@ -94,3 +94,4 @@ if st.button("Find My Career"):
 
 st.divider()
 st.caption("Career Compass AI | Class 12 AI Project")
+
