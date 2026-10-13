@@ -62,7 +62,7 @@ h1, h2, h3, h4, label {
 }
 </style>""", unsafe_allow_html=True)
 
-Dashboard banner
+# Dashboard banner
 
 st.markdown("""
 
