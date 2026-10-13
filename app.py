@@ -648,41 +648,5 @@ with st.form("career_form"):
 # ==========================================
 
 if submitted:
-        student = pd.DataFrame(
-        [
-            {
-                "Subject": subject,
-                "Interest": interest,
-                "Work_Style": work_style
-            }
-        ]
-    )
 
-    probabilities = model.predict_proba(student)[0]
-    classes = model.named_steps["classifier"].classes_
-
-    ranking = sorted(
-        zip(classes, probabilities),
-        key=lambda item: item[1],
-        reverse=True
-    )[:3]
-
-    st.markdown("---")
-    st.header("🎯 Your Career Recommendations")
-
-    for index, (career, score) in enumerate(ranking):
-        info = career_info[career]
-
-        st.subheader(f"{index + 1}. {career}")
-        st.write(info["description"])
-        st.write(f"Model score: {score * 100:.1f}%")
-
-        st.write("**Skills to develop:**")
-        st.write(", ".join(info["skills"]))
-
-        st.write("**Courses to explore:**")
-        st.write(", ".join(info["courses"]))
-
-        with st.expander(f"Explore {career}"):
-            st.write("**Potential strengths:**")
-            st.write(", ".join(info["strengths"]))
+   
