@@ -1,255 +1,319 @@
 import streamlit as st
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.pipeline import Pipeline
-st.set_page_config(page_title="Career Compass AI", page_icon="🎯", layout="wide")
-Page configuration
+from sklearn.tree import DecisionTreeClassifier
+
+# -----------------------------------
+# PAGE CONFIGURATION
+# -----------------------------------
 st.set_page_config(
-page_title="Career Compass AI",
-page_icon="🎯",
-layout="wide")
-
-Custom CSS
-
-st.markdown("""
-
-<style>
-.stApp {
-    background-color: #F3F7FF;
-}
-h1, h2, h3 {
-    color: #173B70;
-}
-.hero {
-    background: linear-gradient(120deg, #123B70, #3478D4);
-    padding: 25px;
-    border-radius: 18px;
-    color: white;
-    text-align: center;
-}
-.hero h1 {
-    color: white;
-}
-.hero p {
-    font-size: 18px;
-}
-.card {
-    background-color: white;
-    padding: 18px;
-    border-radius: 12px;
-    border: 1px solid #D7E5FA;
-    margin-bottom: 12px;
-}
-</style>""", unsafe_allow_html=True)
-
-Main heading
-
-st.markdown("""
-
-<div class="hero">
-    <h1>🎯 Career Compass AI</h1>
-    <p>Discover Your Interests. Explore Your Future.</p>
-    <p>Your journey towards the right career starts here!</p>
-</div>
-""", unsafe_allow_html=True)st.write("")
-
-st.info(
-"Explore possible career paths based on your school stream, "
-"interests, and preferred work style."
+    page_title="Career Compass AI",
+    page_icon="🎯",
+    layout="wide"
 )
 
-Sample dataset
+# -----------------------------------
+# APPLICATION HEADING
+# -----------------------------------
+st.title("🎯 Career Compass AI")
+st.subheader("Discover a Career That Matches Your Interests")
+st.caption("Career Compass AI | Class 12 AI Project")
 
-data = pd.DataFrame({
-"Subject": [
-"Science", "Science", "Science", "Science",
-"Science", "Science", "Science", "Science",
-"Commerce", "Commerce", "Commerce", "Commerce",
-"Commerce", "Commerce", "Humanities", "Humanities",
-"Humanities", "Humanities", "Humanities", "Humanities"
-],
-"Interest": [
-"Technology", "Technology", "Healthcare", "Healthcare",
-"Art & Design", "Technology", "Technology", "Healthcare",
-"Finance", "Business", "Technology", "Finance",
-"Business", "Art & Design", "Writing", "Writing",
-"Art & Design", "Business", "Healthcare", "Technology"
-],
-"Work_Style": [
-"Analytical", "Creative", "Helping People", "Analytical",
-"Creative", "Helping People", "Analytical", "Helping People",
-"Analytical", "Analytical", "Analytical", "Helping People",
-"Creative", "Creative", "Creative", "Helping People",
-"Creative", "Creative", "Helping People", "Analytical"
-],
-"Career": [
-"AI Engineer", "Software Developer", "Doctor",
-"Biomedical Scientist", "Game Designer",
-"AI Ethics Researcher", "Data Scientist", "Nurse",
-"Financial Analyst", "Business Analyst", "Data Analyst",
-"Financial Advisor", "Entrepreneur", "Product Designer",
-"Journalist", "Teacher", "Graphic Designer",
-"Marketing Specialist", "Counselor", "UX Researcher"
-]
-})
-
-Prepare the machine learning model
-
-features = ["Subject", "Interest", "Work_Style"]
-
-preprocessor = ColumnTransformer([
-(
-"categories",
-OneHotEncoder(handle_unknown="ignore"),
-features
+st.write(
+    "Answer a few questions to discover suitable career options, "
+    "your strengths, required skills, and courses after Class 12."
 )
-])
 
-model = Pipeline([
-("preprocessor", preprocessor),
-(
-"classifier",
-DecisionTreeClassifier(max_depth=5, random_state=42)
-)
-])
+st.divider()
 
-model.fit(data[features], data["Career"])
-
-Career descriptions
-
-descriptions = {
-"AI Engineer": "Develops artificial intelligence systems and applications.",
-"Software Developer": "Designs, builds, and maintains software.",
-"Doctor": "Diagnoses illnesses and helps treat patients.",
-"Biomedical Scientist": "Studies biology and medical science.",
-"Game Designer": "Creates concepts and experiences for video games.",
-"AI Ethics Researcher": "Studies the responsible and fair use of AI.",
-"Data Scientist": "Uses data and statistics to solve problems.",
-"Nurse": "Supports patient care and medical treatment.",
-"Financial Analyst": "Studies financial information to support decisions.",
-"Business Analyst": "Helps organizations improve business processes.",
-"Data Analyst": "Examines data to identify useful patterns.",
-"Financial Advisor": "Helps people plan and manage their finances.",
-"Entrepreneur": "Creates and manages a business.",
-"Product Designer": "Designs useful and user-friendly products.",
-"Journalist": "Researches, writes, and reports news and stories.",
-"Teacher": "Helps students learn and develop their skills.",
-"Graphic Designer": "Creates visual designs and communication materials.",
-"Marketing Specialist": "Helps organizations promote products and services.",
-"Counselor": "Supports people with personal and educational choices.",
-"UX Researcher": "Studies user needs to improve digital experiences."
+# -----------------------------------
+# SAMPLE TRAINING DATASET
+# -----------------------------------
+data = {
+    "Subject": [
+        "Science", "Science", "Science", "Science",
+        "Commerce", "Commerce", "Commerce", "Commerce",
+        "Arts", "Arts", "Arts", "Arts",
+        "Science", "Commerce", "Arts", "Science",
+        "Commerce", "Arts"
+    ],
+    "Interest": [
+        "Technology", "Healthcare", "Research", "Technology",
+        "Business", "Finance", "Business", "Finance",
+        "Writing", "Design", "Social Work", "Writing",
+        "Research", "Business", "Design", "Healthcare",
+        "Finance", "Social Work"
+    ],
+    "Work_Style": [
+        "Problem Solving", "Helping People", "Independent",
+        "Problem Solving", "Leadership", "Analytical",
+        "Leadership", "Analytical", "Creative", "Creative",
+        "Helping People", "Creative", "Independent",
+        "Leadership", "Creative", "Helping People",
+        "Analytical", "Helping People"
+    ],
+    "Career": [
+        "Software Engineer", "Doctor", "Research Scientist",
+        "AI Engineer", "Business Manager", "Financial Analyst",
+        "Entrepreneur", "Accountant", "Content Writer",
+        "Graphic Designer", "Social Worker", "Journalist",
+        "Research Scientist", "Entrepreneur", "Graphic Designer",
+        "Doctor", "Financial Analyst", "Social Worker"
+    ]
 }
 
-Career recommendation section
+df = pd.DataFrame(data)
 
-st.header("🔎 Find Your Career")
+# -----------------------------------
+# TRAIN THE AI MODEL
+# -----------------------------------
+X = df[["Subject", "Interest", "Work_Style"]]
+y = df["Career"]
 
-col1, col2 = st.columns(2)
-
-with col1:
-subject = st.selectbox(
-"🎓 Choose your school stream",
-["Science", "Commerce", "Humanities"]
-)
-
-interest = st.selectbox(
-    "💡 What interests you most?",
-    [
-        "Technology",
-        "Finance",
-        "Healthcare",
-        "Writing",
-        "Business",
-        "Art & Design"
+preprocessor = ColumnTransformer(
+    transformers=[
+        (
+            "categorical",
+            OneHotEncoder(handle_unknown="ignore"),
+            ["Subject", "Interest", "Work_Style"]
+        )
     ]
 )
 
-with col2:
-work_style = st.selectbox(
-"🧠 Which work style suits you?",
-["Analytical", "Creative", "Helping People"]
+model = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        (
+            "classifier",
+            DecisionTreeClassifier(
+                max_depth=5,
+                random_state=42
+            )
+        )
+    ]
 )
 
-st.write("")
-st.write("Choose the options that best describe you.")
+model.fit(X, y)
 
-Prediction button
-
-if st.button("🚀 Find My Career", use_container_width=True):
-inputs = pd.DataFrame([{
-"Subject": subject,
-"Interest": interest,
-"Work_Style": work_style
-}])
-
-prediction = model.predict(inputs)[0]
-
-st.markdown("---")
-st.subheader("🎓 Your Suggested Career")
-st.success(f"Your suggested career is: {prediction}")
-
-st.markdown(
-    f'<div class="card"><h3>About This Career</h3>'
-    f'<p>{descriptions[prediction]}</p></div>',
-    unsafe_allow_html=True
-)
-
-st.subheader("🧭 Suggested Next Steps")
-st.write(
-    "1. Research the qualifications required for this career."
-)
-st.write(
-    "2. Explore relevant courses and colleges."
-)
-st.write(
-    "3. Talk to teachers or professionals in this field."
-)
-st.write(
-    "4. Compare this career with other options that interest you."
-)
-
-st.warning(
-    "Educational demonstration: this model uses a small sample "
-    "dataset. Its predictions are not validated career assessments. "
-    "Explore multiple options before making career decisions."
-)
-
-Explore career fields
-
-st.markdown("---")
-st.subheader("🌟 Explore Career Fields")
-
-career_fields = {
-"Technology": (
-"AI Engineer, Software Developer, Data Scientist"
-),
-"Healthcare": (
-"Doctor, Nurse, Biomedical Scientist"
-),
-"Finance": (
-"Financial Analyst, Financial Advisor, Accountant"
-),
-"Business": (
-"Entrepreneur, Business Analyst, Marketing Specialist"
-),
-"Writing": (
-"Journalist, Author, Content Writer"
-),
-"Art & Design": (
-"Graphic Designer, Product Designer, Game Designer"
-)
+# -----------------------------------
+# CAREER INFORMATION
+# -----------------------------------
+career_info = {
+    "Software Engineer": {
+        "strengths": "Logical thinking and problem-solving",
+        "skills": "Python, programming, algorithms, and teamwork",
+        "courses": "B.Tech in Computer Science, BCA, or B.Sc. Computer Science",
+        "explanation": "Your science background, technology interest, "
+                       "and problem-solving preference match this career."
+    },
+    "AI Engineer": {
+        "strengths": "Analytical thinking and logical reasoning",
+        "skills": "Python, mathematics, machine learning, and data analysis",
+        "courses": "B.Tech in AI/Computer Science or B.Sc. Computer Science "
+                   "with relevant AI training",
+        "explanation": "Your interest in technology and problem-solving "
+                       "may suit a career in artificial intelligence."
+    },
+    "Doctor": {
+        "strengths": "Empathy, patience, and scientific thinking",
+        "skills": "Biology, communication, observation, and decision-making",
+        "courses": "MBBS through the applicable NEET-UG admission process",
+        "explanation": "Your interest in healthcare and helping people "
+                       "matches the responsibilities of a medical career."
+    },
+    "Research Scientist": {
+        "strengths": "Curiosity, observation, and critical thinking",
+        "skills": "Research methods, data analysis, and scientific reasoning",
+        "courses": "B.Sc. followed by further study, or an appropriate "
+                   "integrated science degree",
+        "explanation": "Your interest in research and independent work "
+                       "may suit scientific investigation."
+    },
+    "Business Manager": {
+        "strengths": "Leadership, planning, and communication",
+        "skills": "Management, teamwork, decision-making, and organization",
+        "courses": "BBA, B.Com., or another suitable management-related degree",
+        "explanation": "Your business interest and leadership preference "
+                       "may suit management."
+    },
+    "Financial Analyst": {
+        "strengths": "Numerical reasoning and analytical thinking",
+        "skills": "Excel, accounting, financial analysis, and statistics",
+        "courses": "B.Com., BBA in Finance, or another relevant degree",
+        "explanation": "Your interest in finance and analytical work "
+                       "may suit financial analysis."
+    },
+    "Entrepreneur": {
+        "strengths": "Initiative, creativity, and leadership",
+        "skills": "Business planning, communication, budgeting, and marketing",
+        "courses": "BBA, B.Com., or another relevant degree",
+        "explanation": "Your business interest and leadership preference "
+                       "may suit starting or managing a business."
+    },
+    "Accountant": {
+        "strengths": "Accuracy, organization, and numerical reasoning",
+        "skills": "Accounting, Excel, taxation, and financial reporting",
+        "courses": "B.Com. or a suitable accounting-related qualification",
+        "explanation": "Your commerce background and interest in finance "
+                       "may suit accounting."
+    },
+    "Content Writer": {
+        "strengths": "Creativity, language, and communication",
+        "skills": "Writing, research, editing, and grammar",
+        "courses": "BA in English, Journalism, or another relevant degree",
+        "explanation": "Your interest in writing and creative work "
+                       "may suit content creation."
+    },
+    "Graphic Designer": {
+        "strengths": "Visual creativity and imagination",
+        "skills": "Design principles, typography, color theory, and design tools",
+        "courses": "B.Des., a suitable design degree, or a relevant diploma",
+        "explanation": "Your interest in design and creative work "
+                       "may suit graphic design."
+    },
+    "Social Worker": {
+        "strengths": "Empathy, patience, and interpersonal communication",
+        "skills": "Communication, community support, and problem-solving",
+        "courses": "BSW or another suitable social-science degree",
+        "explanation": "Your interest in social work and helping people "
+                       "may suit community-focused work."
+    },
+    "Journalist": {
+        "strengths": "Communication, curiosity, and observation",
+        "skills": "Writing, interviewing, research, and fact-checking",
+        "courses": "BA in Journalism or a relevant mass communication degree",
+        "explanation": "Your interest in writing and communication "
+                       "may suit journalism."
+    }
 }
 
-for field, careers in career_fields.items():
-with st.expander(f"Explore {field}"):
-st.write(careers)
+# -----------------------------------
+# USER INPUT SECTION
+# -----------------------------------
+st.header("📝 Tell Us About Yourself")
 
-Footer
+col1, col2, col3 = st.columns(3)
 
-st.markdown("---")
-st.caption("Career Compass AI | Class 12 AI Project")
+with col1:
+    subject = st.selectbox(
+        "Choose your stream",
+        ["Science", "Commerce", "Arts"]
+    )
+
+with col2:
+    interest = st.selectbox(
+        "What interests you most?",
+        [
+            "Technology",
+            "Healthcare",
+            "Research",
+            "Business",
+            "Finance",
+            "Writing",
+            "Design",
+            "Social Work"
+        ]
+    )
+
+with col3:
+    work_style = st.selectbox(
+        "Which work style do you prefer?",
+        [
+            "Problem Solving",
+            "Helping People",
+            "Independent",
+            "Leadership",
+            "Analytical",
+            "Creative"
+        ]
+    )
+
+st.write("")
+
+# -----------------------------------
+# CAREER PREDICTION
+# -----------------------------------
+if st.button("🔍 Find My Career", type="primary"):
+
+    user_data = pd.DataFrame(
+        [{
+            "Subject": subject,
+            "Interest": interest,
+            "Work_Style": work_style
+        }]
+    )
+
+    probabilities = model.predict_proba(user_data)[0]
+    classes = model.named_steps["classifier"].classes_
+
+    ranked_indices = probabilities.argsort()[::-1]
+
+    recommendations = []
+
+    for index in ranked_indices:
+        career = classes[index]
+
+        if career not in recommendations:
+            recommendations.append(career)
+
+        if len(recommendations) == 3:
+            break
+
+    st.divider()
+    st.header("🌟 Your Career Recommendations")
+
+    st.info(
+        "These are AI-generated suggestions based on your answers. "
+        "Use them as a starting point for career exploration."
+    )
+
+    for rank, career in enumerate(recommendations, start=1):
+
+        details = career_info[career]
+
+        with st.container(border=True):
+
+            st.subheader(f"{rank}. {career}")
+
+            st.write("💪 **Your potential strengths**")
+            st.write(details["strengths"])
+
+            st.write("🛠️ **Skills to develop**")
+            st.write(details["skills"])
+
+            st.write("🎓 **Suitable courses after Class 12**")
+            st.write(details["courses"])
+
+            st.write("🤖 **AI explanation**")
+            st.write(details["explanation"])
+
+            st.write(
+                f"**Model score:** {probabilities[classes.tolist().index(career)] * 100:.1f}%"
+            )
+
+    st.divider()
+
+    st.subheader("💡 A Helpful Career Tip")
+
+    st.write(
+        "Before choosing a career, explore the course syllabus, "
+        "eligibility requirements, fees, and future opportunities. "
+        "Talk to teachers, counsellors, and professionals in the field."
+    )
+
+# -----------------------------------
+# FOOTER
+# -----------------------------------
+st.divider()
+
 st.caption(
-"Designed to support career exploration and informed decisions."
+    "Career Compass AI | Educational AI Project | Class 12"
+)
+
+st.caption(
+    "Note: This demonstration uses a small sample dataset. "
+    "Recommendations are educational suggestions, not guaranteed "
+    "predictions of career success."
 )
