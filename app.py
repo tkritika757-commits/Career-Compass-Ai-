@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-from sklearn.tree import
-DecisionTreeClassifier
+sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
