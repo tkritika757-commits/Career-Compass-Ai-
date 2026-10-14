@@ -518,7 +518,7 @@ data = pd.DataFrame(
 
 
 # ==========================================
-# MACHINE LEARNING MODEL
+# IMPROVED MACHINE LEARNING MODEL
 # ==========================================
 
 features = [
@@ -542,7 +542,10 @@ preprocessor = ColumnTransformer(
 
 model = Pipeline(
     steps=[
-        ("preprocessor", preprocessor),
+        (
+            "preprocessor",
+            preprocessor
+        ),
         (
             "classifier",
             DecisionTreeClassifier(
@@ -555,7 +558,6 @@ model = Pipeline(
 )
 
 model.fit(X, y)
-
 
 # ==========================================
 # STUDENT INPUT FORM
@@ -735,6 +737,227 @@ if submitted:
             """,
             unsafe_allow_html=True
         )
+# ==========================================
+# CAREER PREDICTION
+# ==========================================
+
+if submitted:
+
+    student = pd.DataFrame(
+        [
+            {
+                "Subject": subject,
+                "Interest": interest,
+                "Work_Style": work_style
+            }
+        ]
+    )
+
+    # Get model scores for the selected profile
+    probabilities = model.predict_proba(student)[0]
+    classes = model.named_steps["classifier"].classes_
+
+    # Additional profile-based relevance scoring
+    relevance = {
+        career: 0.0
+        for career in career_info
+    }
+
+    subject_matches = {
+        "Computer Science": [
+            "AI Engineer",
+            "Software Developer",
+            "Data Analyst",
+            "Graphic Designer"
+        ],
+        "Mathematics": [
+            "AI Engineer",
+            "Software Developer",
+            "Data Analyst",
+            "Business Manager"
+        ],
+        "Biology": [
+            "Doctor",
+            "Biotechnologist",
+            "Environmental Scientist"
+        ],
+        "Science": [
+            "Doctor",
+            "Biotechnologist",
+            "Environmental Scientist",
+            "AI Engineer"
+        ],
+        "Commerce": [
+            "Business Manager",
+            "Data Analyst"
+        ],
+        "Arts & Humanities": [
+            "Graphic Designer",
+            "Business Manager"
+        ]
+    }
+
+    interest_matches = {
+        "Technology": [
+            "AI Engineer",
+            "Software Developer",
+            "Data Analyst"
+        ],
+        "Helping People": [
+            "Doctor",
+            "Business Manager"
+        ],
+        "Business": [
+            "Business Manager",
+            "Data Analyst"
+        ],
+        "Creative Work": [
+            "Graphic Designer",
+            "Software Developer"
+        ],
+        "Research": [
+            "Biotechnologist",
+            "Data Analyst",
+            "Environmental Scientist",
+            "AI Engineer"
+        ],
+        "Nature": [
+            "Environmental Scientist",
+            "Biotechnologist"
+        ]
+    }
+
+    work_style_matches = {
+        "Analytical": [
+            "AI Engineer",
+            "Data Analyst",
+            "Biotechnologist",
+            "Environmental Scientist"
+        ],
+        "People-oriented": [
+            "Doctor",
+            "Business Manager"
+        ],
+        "Creative": [
+            "Graphic Designer",
+            "Software Developer"
+        ],
+        "Practical": [
+            "Software Developer",
+            "Doctor",
+            "Environmental Scientist"
+        ],
+        "Organized": [
+            "Business Manager",
+            "Data Analyst",
+            "Doctor"
+        ],
+        "Independent": [
+            "AI Engineer",
+            "Software Developer",
+            "Biotechnologist",
+            "Graphic Designer"
+        ]
+    }
+
+    # Award points for matching each preference
+    for career in subject_matches.get(subject, []):
+        relevance[career] += 3
+
+    for career in interest_matches.get(interest, []):
+        relevance[career] += 4
+
+    for career in work_style_matches.get(work_style, []):
+        relevance[career] += 2
+
+    # Combine the model output with transparent
+    # profile-based relevance scores.
+    model_scores = dict(zip(classes, probabilities))
+
+    final_scores = {}
+
+    for career in career_info:
+
+        model_score = model_scores.get(career, 0.0)
+
+        final_scores[career] = (
+            relevance[career]
+            + model_score
+        )
+
+    ranking = sorted(
+        final_scores.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )[:3]
+
+    st.markdown("---")
+
+    greeting = (
+        f"Welcome, {name.strip()}!"
+        if name.strip()
+        else "Your Career Discovery Results"
+    )
+
+    st.markdown(
+        f"""
+        <div class="panel">
+            <div class="section-label">
+                02 / YOUR RESULTS
+            </div>
+
+            <h2>{greeting}</h2>
+
+            <p>
+                Explore these career paths based on your
+                selected interests and preferences.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    metric1, metric2, metric3 = st.columns(3)
+
+    metric1.metric("Education Level", study_level)
+    metric2.metric("Interest", interest)
+    metric3.metric("Work Style", work_style)
+
+    st.markdown("## ✦ Your Top 3 Career Matches")
+
+    st.caption(
+        "Recommendations combine a demonstration "
+        "machine-learning model with profile-based "
+        "relevance rules. Scores are ranking values, "
+        "not probabilities or guarantees of career success."
+    )
+
+    for index, (career, score) in enumerate(ranking):
+
+        info = career_info[career]
+
+        st.markdown(
+            f"""
+            <div class="career-card">
+                <div class="career-number">
+                    CAREER OPTION 0{index + 1}
+                </div>
+
+                <div class="career-title">
+                    {career}
+                </div>
+
+                <div class="career-description">
+                    {info["description"]}
+                </div>
+
+                <div class="match-label">
+                    Profile relevance score: {score:.2f}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         with st.expander(f"Explore {career}"):
 
@@ -776,8 +999,6 @@ if submitted:
         "different fields before making an important "
         "education or career decision."
     )
-
-
 # ==========================================
 # CAREER EXPLORATION SECTION
 # ==========================================
